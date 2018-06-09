@@ -17,7 +17,7 @@ my_colors = ["lightslategray","mediumseagreen","mediumslateblue"]
 
 def run():
 	mpl_formatting()
-	messages = {}
+	messages = {} #{name : [Message tuples]}
 	read_parse("chat.txt",messages)
 	generate_stats(messages)
 
@@ -56,8 +56,6 @@ def read_parse(filename,messages):
 def generate_stats(messages):
 	lim = 1500
 
-
-	
 	weekday_cnt = collections.OrderedDict() #{name : {(num,dayofweek) : count}}
 	for sender in messages:
 		weekday_cnt[sender] = collections.Counter()
@@ -68,19 +66,14 @@ def generate_stats(messages):
 			# cnt_total.update(msg[2].split())
 			# cnt_total[msg[1]+" "+str(msg[0].hour)]+=1
 
-			lim -= 1
-			if lim is 0:
-				break
 
-		# weekday_cnt[sender] = sorted(weekday_cnt[sender],key=itemgetter(0))
-		for k in weekday_cnt[sender]:
-			print k, weekday_cnt[sender][k]
-	
+		weekday_cnt[sender] = sorted(weekday_cnt[sender],key=itemgetter(0,1))
 
-	plot_count(messages)
+
+	# plot_count(messages)
 	mpl_formatting()
 	# plot_messages_over_time(messages)
-	# plot_byweekday(messages)
+	plot_byweekday(weekday_cnt)
 
 def mpl_formatting():
 	plt.style.use('dark_background')
@@ -147,13 +140,8 @@ def plot_messages_over_time(messages):
 	dates = date2num(dates), date2num([x[0] for x in lst])
 
 	fig,ax = plt.subplots()
-	
-
 
 	plt.title('messages over time',color=my_colors[0])
-
-
-
 
 	ax.hist(dates,bins=70,histtype='barstacked', width=10, color=my_colors[1:],label=names,edgecolor='none')
 	ax.legend(prop={'size': 10})
@@ -171,21 +159,14 @@ def plot_messages_over_time(messages):
 def plot_bymonth(messages):
 	print np.arange(1,14)
 
-def plot_byweekday(messages):
-	names = messages.keys()
-	lst = messages.itervalues().next()
-	dates = [x[0].strftime("%B") for x in lst]
-	yourdata = collections.Counter()
-	for msg in lst: 
-		yourdata[(msg.timestamp.strftime("w"),msg.timestamp.strftime("%B"))]+=1
+def plot_byweekday(weekday_cnt):
+	weekdays = weekday_cnt[0].keys()
+	values = messages.itervalues().next()
+	values = values, messages.itervalues().next()
 
-	s_data = sorted(data, key=itemgetter(0,2))
-	xlist = [x[1] for x in s_data]
-	# lst = messages.itervalues().next()
-	# dates = dates, [x[0].strftime("%a") for x in lst]
-	N = 5
-	men_means = (20, 35, 30, 35, 27)
-	men_std = (2, 3, 4, 1, 2)
+
+
+	N = 7
 
 	ind = np.arange(N)  # the x locations for the groups
 	width = 0.35       # the width of the bars
@@ -198,10 +179,10 @@ def plot_byweekday(messages):
 	rects2 = ax.bar(ind + width, women_means, width, color='y', yerr=women_std)
 
 	# add some text for labels, title and axes ticks
-	ax.set_ylabel('Scores')
-	ax.set_title('Scores by group and gender')
+	# ax.set_ylabel('Scores')
+	ax.set_title('messages by weekday')
 	ax.set_xticks(ind + width / 2)
-	ax.set_xticklabels(('G1', 'G2', 'G3', 'G4', 'G5'))
+	ax.set_xticklabels(weekdays)
 
 	ax.legend((rects1[0], rects2[0]), ('Men', 'Women'))
 
@@ -258,43 +239,7 @@ def plot_byweekday(messages):
 # 	plt.yticks(np.arange(0, 81, 10))
 # 	plt.legend((p1[0], p2[0]), ('Men', 'Women'))
 
-# 	plt.show()
-
-
-# def plot_monthly_messages(data):
-	
-# 	s_data = sorted(data, key=itemgetter(0,2))
-# 	xlist = [x[1] for x in s_data]
-
-
-# 	N = data.values().length()
-
-# 	names = list(set([x[2] for x in data]))
-# 	print list(names)
-
-# 	fig, ax1 = plt.subplots()
-# 	ax1.legend(prop={'size': 10})
-# 	ax1.set_title('Messages by Month')
-# 	colors = ("mediumseagreen","mediumslateblue")
-# 	ax1.hist(x, n_bins, normed=1, histtype='bar', stacked=True, color='r', label=names)
-
-# 	menMeans = (20, 35, 30, 35, 27)
-# 	womenMeans = (25, 32, 34, 20, 25)
-# 	menStd = (2, 3, 4, 1, 2)
-# 	womenStd = (3, 5, 2, 3, 3)
-# 	ind = np.arange(N)    # the x locations for the groups
-# 	width = 0.35       # the width of the bars: can also be len(x) sequence
-
-# 	p1 = plt.bar(ind, menMeans, width, color='#d62728', yerr=menStd)
-# 	p2 = plt.bar(ind, womenMeans, width, bottom=menMeans, yerr=womenStd)
-
-# 	plt.ylabel('Scores')
-# 	plt.title('Scores by group and gender')
-# 	plt.xticks(ind, ('G1', 'G2', 'G3', 'G4', 'G5'))
-# 	plt.yticks(np.arange(0, 81, 10))
-# 	plt.legend((p1[0], p2[0]), ('Men', 'Women'))
-
-# 	plt.show()
+# 	plt.show()	
 
 
 
